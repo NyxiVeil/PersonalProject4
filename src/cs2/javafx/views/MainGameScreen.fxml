@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+    MainGameScreen.fxml — Root shell.
+    RPG parchment / medieval fantasy aesthetic.
+
+    Layout:
+      LEFT   — navigation sidebar (dark brown wood panel)
+      CENTER — swappable sub-pane (centerContainer)
+      BOTTOM — black combat / chat log
+-->
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cs2.javafx.controllers.MainGameScreenController"
+            style="-fx-background-color: #E8C97A;">
+
+    <!-- ── LEFT NAVIGATION SIDEBAR ───────────────────────────── -->
+    <left>
+        <VBox spacing="0"
+              style="-fx-background-color: #7A5010;
+                     -fx-min-width: 160px;
+                     -fx-border-color: #3B1F00;
+                     -fx-border-width: 0 3 0 0;">
+
+            <!-- Top ribbon / bookmark accent -->
+            <VBox style="-fx-background-color: #8B1A1A; -fx-min-height: 8px;" />
+
+            <!-- Nav buttons -->
+            <VBox spacing="2" style="-fx-padding: 8 8 8 8;">
+
+                <Button text="Story Progress" maxWidth="Infinity"
+                        onAction="#showStoryProgress"
+                        style="-fx-background-color: #D4A843;
+                               -fx-text-fill: #2B1200;
+                               -fx-font-size: 13px;
+                               -fx-font-family: 'Georgia';
+                               -fx-border-color: #6B4C11;
+                               -fx-border-width: 1.5;
+                               -fx-border-radius: 2;
+                               -fx-background-radius: 2;
+                               -fx-padding: 8 4;
+                               -fx-cursor: hand;" />
+
+                <Button text="Battle" maxWidth="Infinity"
+                        onAction="#showBattle"
+                        style="-fx-background-color: #D4A843;
+                               -fx-text-fill: #2B1200;
+                               -fx-font-size: 13px;
+                               -fx-font-family: 'Georgia';
+                               -fx-border-color: #6B4C11;
+                               -fx-border-width: 1.5;
+                               -fx-border-radius: 2;
+                               -fx-background-radius: 2;
+                               -fx-padding: 8 4;
+                               -fx-cursor: hand;" />
+
+                <!-- TEMPORARY TEST FEATURE — REMOVE LATER -->
+                <Button text="⚔ Test Battle" maxWidth="Infinity"
+                        onAction="#showTestBattle"
+                        style="-fx-background-color: #8B1A1A;
+                               -fx-text-fill: #FFE0A0;
+                               -fx-font-size: 12px;
+                               -fx-font-weight: bold;
+                               -fx-font-family: 'Georgia';
+                               -fx-border-color: #3B0000;
+                               -fx-border-width: 1.5;
+                               -fx-border-radius: 2;
+                               -fx-background-radius: 2;
+                               -fx-padding: 8 4;
+                               -fx-cursor: hand;" />
+
+                <Button text="Inventory" maxWidth="Infinity"
+                        onAction="#showInventory"
+                        style="-fx-background-color: #D4A843;
+                               -fx-text-fill: #2B1200;
+                               -fx-font-size: 13px;
+                               -fx-font-family: 'Georgia';
+                               -fx-border-color: #6B4C11;
+                               -fx-border-width: 1.5;
+                               -fx-border-radius: 2;
+                               -fx-background-radius: 2;
+                               -fx-padding: 8 4;
+                               -fx-cursor: hand;" />
+
+                <Button text="Quest" maxWidth="Infinity"
+                        onAction="#showQuest"
+                        style="-fx-background-color: #D4A843;
+                               -fx-text-fill: #2B1200;
+                               -fx-font-size: 13px;
+                               -fx-font-family: 'Georgia';
+                               -fx-border-color: #6B4C11;
+                               -fx-border-width: 1.5;
+                               -fx-border-radius: 2;
+                               -fx-background-radius: 2;
+                               -fx-padding: 8 4;
+                               -fx-cursor: hand;" />
+            </VBox>
+
+            <!-- Spacer pushes Save/Load/Exit to the bottom -->
+            <Region VBox.vgrow="ALWAYS" />
+
+            <!-- Bottom utility buttons -->
+            <VBox spacing="2" style="-fx-padding: 8 8 12 8;">
+                <Button text="Save" maxWidth="Infinity"
+                        onAction="#handleSave"
+                        style="-fx-background-color: #C09020;
+                               -fx-text-fill: #1A0800;
+                               -fx-font-size: 12px;
+                               -fx-font-family: 'Georgia';
+                               -fx-border-color: #6B4C11;
+                               -fx-border-width: 1.5;
+                               -fx-border-radius: 2;
+                               -fx-background-radius: 2;
+                               -fx-padding: 6 4;
+                               -fx-cursor: hand;" />
+                <Button text="Load" maxWidth="Infinity"
+                        onAction="#handleLoad"
+                        style="-fx-background-color: #C09020;
+                               -fx-text-fill: #1A0800;
+                               -fx-font-size: 12px;
+                               -fx-font-family: 'Georgia';
+                               -fx-border-color: #6B4C11;
+                               -fx-border-width: 1.5;
+                               -fx-border-radius: 2;
+                               -fx-background-radius: 2;
+                               -fx-padding: 6 4;
+                               -fx-cursor: hand;" />
+                <Button text="Exit" maxWidth="Infinity"
+                        onAction="#handleExit"
+                        style="-fx-background-color: #8B1A1A;
+                               -fx-text-fill: #FFE0A0;
+                               -fx-font-size: 12px;
+                               -fx-font-family: 'Georgia';
+                               -fx-border-color: #3B0000;
+                               -fx-border-width: 1.5;
+                               -fx-border-radius: 2;
+                               -fx-background-radius: 2;
+                               -fx-padding: 6 4;
+                               -fx-cursor: hand;" />
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- ── CENTER + BOTTOM (swappable sub-pane + log) ────────── -->
+    <center>
+        <VBox style="-fx-background-color: #E8C97A;">
+            <!-- Swappable sub-pane -->
+            <BorderPane fx:id="centerContainer"
+                        VBox.vgrow="ALWAYS"
+                        style="-fx-background-color: transparent; -fx-padding: 0;" />
+
+            <!-- Combat / chat log restricted to the center area -->
+            <TextArea fx:id="combatLog"
+                      editable="false"
+                      prefHeight="180"
+                      promptText="Chat log / Combat log..."
+                      style="-fx-control-inner-background: #0D0D0D;
+                             -fx-text-fill: #E8E0C0;
+                             -fx-font-family: 'Courier New';
+                             -fx-font-size: 16px;
+                             -fx-border-color: #3B1F00;
+                             -fx-border-width: 3 0 0 0;
+                             -fx-background-color: #0D0D0D;" />
+        </VBox>
+    </center>
+
+</BorderPane>

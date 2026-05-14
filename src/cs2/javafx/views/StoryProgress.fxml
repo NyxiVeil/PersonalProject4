@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" spacing="15"
+      xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cs2.javafx.controllers.StoryProgressController"
+      style="-fx-background-color: #E8C97A; -fx-padding: 40;">
+      
+    <Label text="Day 0: The Awakening"
+           style="-fx-text-fill: #3B1F00;
+                  -fx-font-family: 'Georgia';
+                  -fx-font-size: 28px;
+                  -fx-font-weight: bold;
+                  -fx-effect: dropshadow(gaussian, rgba(107,76,17,0.3), 4, 0.5, 1, 1);" />
+                  
+    <Label text="You wake up in Thornhollow, unable to recall your past."
+           style="-fx-text-fill: #2B1200;
+                  -fx-font-family: 'Georgia';
+                  -fx-font-size: 16px;
+                  -fx-font-style: italic;" />
+</VBox>
