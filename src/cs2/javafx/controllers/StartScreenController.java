@@ -8,7 +8,7 @@ public class StartScreenController {
 
     @FXML
     private void handleStartGame(ActionEvent event) {
-        // Switch to the main game screen (full scene replacement)
-        ScreenManager.setScreen("/cs2/javafx/views/MainGameScreen.fxml");
+        // Switch to the save selection screen
+        ScreenManager.setScreen("/cs2/javafx/views/SaveSelectionScreen.fxml");
     }
 }

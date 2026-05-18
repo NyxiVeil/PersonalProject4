@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane xmlns="http://javafx.com/javafx/17"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="cs2.javafx.controllers.SaveSelectionController"
+           style="-fx-background-color: #E8C97A;
+                  -fx-border-color: #6B4C11;
+                  -fx-border-width: 12;
+                  -fx-border-style: solid;">
+
+    <StackPane style="-fx-border-color: #3B1F00; -fx-border-width: 2; -fx-margin: 8;">
+        <VBox alignment="CENTER" spacing="30.0" style="-fx-padding: 20;">
+            
+            <Label text="Select Save Slot"
+                   style="-fx-text-fill: #3B1F00;
+                          -fx-font-family: 'Georgia';
+                          -fx-font-size: 36px;
+                          -fx-font-weight: bold;" />
+
+            <!-- Slot 1 -->
+            <HBox spacing="10" alignment="CENTER" style="-fx-border-color: #6B4C11; -fx-border-width: 2; -fx-padding: 10; -fx-background-color: #D4A843; -fx-background-radius: 4; -fx-border-radius: 4;">
+                <Label fx:id="slot1Label" text="Empty Slot" prefWidth="250" style="-fx-font-family: 'Georgia'; -fx-font-size: 16px; -fx-text-fill: #2B1200;"/>
+                <Button fx:id="btnSelect1" text="Select" onAction="#onSelectSlot1" style="-fx-background-color: #8B1A1A; -fx-text-fill: #FFE0A0; -fx-font-weight: bold; -fx-cursor: hand;" />
+                <Button fx:id="btnDelete1" text="Delete" onAction="#onDeleteSlot1" style="-fx-background-color: #555555; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" visible="false" />
+            </HBox>
+
+            <!-- Slot 2 -->
+            <HBox spacing="10" alignment="CENTER" style="-fx-border-color: #6B4C11; -fx-border-width: 2; -fx-padding: 10; -fx-background-color: #D4A843; -fx-background-radius: 4; -fx-border-radius: 4;">
+                <Label fx:id="slot2Label" text="Empty Slot" prefWidth="250" style="-fx-font-family: 'Georgia'; -fx-font-size: 16px; -fx-text-fill: #2B1200;"/>
+                <Button fx:id="btnSelect2" text="Select" onAction="#onSelectSlot2" style="-fx-background-color: #8B1A1A; -fx-text-fill: #FFE0A0; -fx-font-weight: bold; -fx-cursor: hand;" />
+                <Button fx:id="btnDelete2" text="Delete" onAction="#onDeleteSlot2" style="-fx-background-color: #555555; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" visible="false" />
+            </HBox>
+
+            <!-- Slot 3 -->
+            <HBox spacing="10" alignment="CENTER" style="-fx-border-color: #6B4C11; -fx-border-width: 2; -fx-padding: 10; -fx-background-color: #D4A843; -fx-background-radius: 4; -fx-border-radius: 4;">
+                <Label fx:id="slot3Label" text="Empty Slot" prefWidth="250" style="-fx-font-family: 'Georgia'; -fx-font-size: 16px; -fx-text-fill: #2B1200;"/>
+                <Button fx:id="btnSelect3" text="Select" onAction="#onSelectSlot3" style="-fx-background-color: #8B1A1A; -fx-text-fill: #FFE0A0; -fx-font-weight: bold; -fx-cursor: hand;" />
+                <Button fx:id="btnDelete3" text="Delete" onAction="#onDeleteSlot3" style="-fx-background-color: #555555; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" visible="false" />
+            </HBox>
+
+            <Button text="Back to Main Menu" onAction="#onBack"
+                    style="-fx-background-color: #3B1F00; -fx-text-fill: #E8C97A; -fx-font-size: 14px; -fx-cursor: hand; -fx-margin: 20 0 0 0;" />
+        </VBox>
+    </StackPane>
+</StackPane>

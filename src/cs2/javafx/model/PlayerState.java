@@ -1,5 +1,6 @@
 package cs2.javafx.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +12,9 @@ import java.util.Map;
  *
  * Inventory is stored as: item display name → quantity.
  */
-public class PlayerState {
+public class PlayerState implements Serializable {
+    private static final long serialVersionUID = 1L;
+
 
     private String      name;
     private PlayerClass playerClass;
