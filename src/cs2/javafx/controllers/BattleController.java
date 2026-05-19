@@ -67,6 +67,8 @@ public class BattleController {
     // ── State ─────────────────────────────────────────────────────
     private final CombatEngine engine = new CombatEngine();
     private MainGameScreenController parentController;
+    private boolean isStoryBattle = false;
+    private CombatResult.Outcome lastOutcome = null;
 
     /**
      * FIX 1 — Delay between sequential combat actions.
@@ -157,7 +159,8 @@ public class BattleController {
         Enemy enemy = ENEMY_MAP.get(enemyLabel).get();
 
         // Start engine
-        engine.startCombat(player, enemy);
+        isStoryBattle = false;
+        engine.startCombat(player, List.of(enemy));
 
         // Show battle panel
         setupPanel.setVisible(false);
@@ -178,6 +181,53 @@ public class BattleController {
         log("Your passive: " + chosenClass.getPassiveDescription());
     }
 
+    public void startStoryBattleWithEnemies(List<String> enemyNames) {
+        PlayerState player = GameManager.getInstance().getPlayerState();
+        if (player == null) {
+            log("ERROR: No player state found!");
+            return;
+        }
+
+        List<Enemy> enemies = new java.util.ArrayList<>();
+        for (String name : enemyNames) {
+            // Check the map for exact match or partial match (since map keys have HP)
+            Enemy e = null;
+            for (String key : ENEMY_MAP.keySet()) {
+                if (key.startsWith(name)) {
+                    e = ENEMY_MAP.get(key).get();
+                    break;
+                }
+            }
+            if (e != null) {
+                enemies.add(e);
+            }
+        }
+
+        if (enemies.isEmpty()) {
+            log("ERROR: Could not create any enemies for: " + String.join(", ", enemyNames));
+            return;
+        }
+
+        isStoryBattle = true;
+        engine.startCombat(player, enemies);
+
+        // Show battle panel directly
+        setupPanel.setVisible(false);
+        setupPanel.setManaged(false);
+        battlePanel.setVisible(true);
+        battlePanel.setManaged(true);
+
+        PlayerClass chosenClass = player.getPlayerClass();
+        btnDodge.setDisable(chosenClass == PlayerClass.KNIGHT);
+        btnBlock.setDisable(chosenClass == PlayerClass.THIEF);
+
+        setupTooltips(chosenClass);
+        updateUI();
+        log("=== Battle started: " + player.getName()
+                + " [" + chosenClass.getDisplayName() + "] vs " + enemies.size() + " enemies ===");
+        log("Your passive: " + chosenClass.getPassiveDescription());
+    }
+
     // ── Action button handlers ────────────────────────────────────
 
     @FXML private void onAttack()  { processResultAnimated(engine.playerAttack()); }
@@ -191,34 +241,39 @@ public class BattleController {
      */
     @FXML
     private void onUseItem() {
-        Map<String, Integer> inv = engine.getPlayer().getInventory();
-        if (inv.isEmpty()) {
+        PlayerState player = engine.getPlayer();
+        if (player.getInventory().isEmpty()) {
             log("Inventory is empty — no items to use.");
             return;
         }
 
-        if (inv.size() == 1) {
-            // Only one item type — use it immediately
-            String itemName = inv.keySet().iterator().next();
-            processResultAnimated(engine.playerUseItem(itemName));
-        } else {
-            // Multiple item types — show choice dialog
-            ChoiceDialog<String> dialog = new ChoiceDialog<>(
-                    inv.keySet().iterator().next(),
-                    inv.keySet()
-            );
-            dialog.setTitle("Use Item");
-            dialog.setHeaderText("Choose an item to use:");
-            dialog.setContentText("Item:");
-            dialog.showAndWait().ifPresent(chosen ->
-                    processResultAnimated(engine.playerUseItem(chosen))
-            );
+        String chosenItem = InventoryController.showInventoryDialog(
+                btnUseItem.getScene().getWindow(),
+                player,
+                true // isCombat
+        );
+
+        if (chosenItem != null) {
+            processResultAnimated(engine.playerUseItem(chosenItem));
         }
     }
 
     /** Returns to the setup panel for a new test battle. */
     @FXML
     private void onRestart() {
+        if (isStoryBattle) {
+            GameManager gm = GameManager.getInstance();
+            boolean isWin = (lastOutcome == CombatResult.Outcome.PLAYER_WIN);
+            boolean isFlee = (lastOutcome == CombatResult.Outcome.FLED);
+
+            StoryManager.applyCombatResult(gm.getCurrentDay(), isWin, isFlee, gm);
+
+            if (parentController != null) {
+                parentController.showStoryProgress(null);
+            }
+            return;
+        }
+
         // Reset to setup panel
         battlePanel.setVisible(false);
         battlePanel.setManaged(false);
@@ -274,9 +329,10 @@ public class BattleController {
         // After all entries: do a final full refresh and handle outcome
         sequence.setOnFinished(e -> {
             updateUI(); // ensure everything is in sync at round end
-            switch (result.getOutcome()) {
+            lastOutcome = result.getOutcome();
+            switch (lastOutcome) {
                 case PLAYER_WIN:
-                    log("✅ Victory! " + engine.getEnemy().getName() + " defeated.");
+                    log("✅ Victory! All enemies defeated.");
                     endCombat();
                     break;
                 case PLAYER_LOSE:
@@ -357,7 +413,21 @@ public class BattleController {
     /** Refreshes only the enemy HP bar, label, and colour. */
     private void refreshEnemyHP() {
         Enemy enemy = engine.getEnemy();
-        enemyNameLabel.setText(enemy.getName() + (enemy.isBoss() ? " ★" : ""));
+        if (enemy == null) {
+            enemyNameLabel.setText("Cleared");
+            enemyHPBar.setProgress(0);
+            enemyHPLabel.setText("HP: 0 / 0");
+            enemyHPBar.setStyle(hpBarStyle(0));
+            return;
+        }
+        
+        int aliveCount = 0;
+        for (Enemy e : engine.getEnemies()) {
+            if (e.isAlive()) aliveCount++;
+        }
+        String multiSuffix = aliveCount > 1 ? (" (+" + (aliveCount - 1) + " more)") : "";
+
+        enemyNameLabel.setText(enemy.getName() + (enemy.isBoss() ? " ★" : "") + multiSuffix);
         double pct = (double) enemy.getCurrentHP() / enemy.getMaxHP();
         enemyHPBar.setProgress(Math.max(0, pct));
         enemyHPLabel.setText("HP: " + enemy.getCurrentHP() + " / " + enemy.getMaxHP());
@@ -382,6 +452,11 @@ public class BattleController {
      */
     private void refreshTurnLabel(boolean enemyTurn) {
         Enemy enemy = engine.getEnemy();
+        if (enemy == null) {
+            turnLabel.setText("Victory!");
+            return;
+        }
+
         if (enemyTurn) {
             if (enemy.isStunned()) {
                 turnLabel.setText("Enemy Turn  [Boss is STUNNED — cannot act]");
@@ -404,6 +479,11 @@ public class BattleController {
     /** Disables action buttons and shows the restart button. */
     private void endCombat() {
         setActionButtonsDisabled(true);
+        if (isStoryBattle) {
+            btnRestart.setText("Continue Story");
+        } else {
+            btnRestart.setText("New Battle");
+        }
         btnRestart.setVisible(true);
         btnRestart.setManaged(true);
     }

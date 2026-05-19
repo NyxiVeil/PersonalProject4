@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cs2.javafx.controllers.InventoryController"
+      spacing="15"
+      style="-fx-background-color: #E8C97A; -fx-padding: 20; -fx-border-color: #6B4C11; -fx-border-width: 3;"
+      prefWidth="450"
+      prefHeight="400">
+
+    <!-- Header Section -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="🎒 Player Inventory"
+               style="-fx-text-fill: #3B1F00; -fx-font-size: 20px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+        <Label fx:id="capacityLabel" text="(0/10 types)"
+               style="-fx-text-fill: #5C3A00; -fx-font-size: 14px; -fx-font-style: italic; -fx-font-family: 'Georgia';" />
+    </HBox>
+
+    <!-- Currency Section -->
+    <HBox spacing="5" alignment="CENTER_LEFT">
+        <Label text="Gold:" style="-fx-text-fill: #3B1F00; -fx-font-size: 14px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+        <Label fx:id="goldLabel" text="0g" style="-fx-text-fill: #D4A843; -fx-font-size: 14px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+    </HBox>
+
+    <!-- Items List View -->
+    <ListView fx:id="itemListView"
+              VBox.vgrow="ALWAYS"
+              style="-fx-background-color: #F4E4C1; -fx-control-inner-background: #F4E4C1; -fx-border-color: #6B4C11; -fx-border-width: 1.5; -fx-font-family: 'Georgia'; -fx-font-size: 13px;" />
+
+    <!-- Action Buttons -->
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button fx:id="useBtn" text="Use Item" onAction="#handleUse"
+                style="-fx-background-color: #8B1A1A; -fx-text-fill: #FFE0A0; -fx-font-size: 13px; -fx-font-weight: bold; -fx-font-family: 'Georgia'; -fx-border-color: #3B0000; -fx-border-width: 1.5; -fx-cursor: hand;" />
+        <Button fx:id="deleteBtn" text="Delete Item" onAction="#handleDelete"
+                style="-fx-background-color: #D4A843; -fx-text-fill: #2B1200; -fx-font-size: 13px; -fx-font-weight: bold; -fx-font-family: 'Georgia'; -fx-border-color: #6B4C11; -fx-border-width: 1.5; -fx-cursor: hand;" />
+        <Button fx:id="closeBtn" text="Close" onAction="#handleClose"
+                style="-fx-background-color: #C09020; -fx-text-fill: #1A0800; -fx-font-size: 13px; -fx-font-family: 'Georgia'; -fx-border-color: #6B4C11; -fx-border-width: 1.5; -fx-cursor: hand;" />
+    </HBox>
+
+</VBox>

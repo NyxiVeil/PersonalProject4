@@ -8,8 +8,11 @@ import javafx.scene.Parent;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import cs2.javafx.model.GameManager;
+import cs2.javafx.model.PlayerState;
 import cs2.javafx.model.SaveData;
 import cs2.javafx.model.SaveManager;
+
+import java.util.List;
 
 public class MainGameScreenController {
 
@@ -34,7 +37,7 @@ public class MainGameScreenController {
     }
 
     @FXML
-    private void showStoryProgress(ActionEvent event) {
+    public void showStoryProgress(ActionEvent event) {
         Parent view = ScreenManager.loadSubPane("/cs2/javafx/views/StoryProgress.fxml");
         if (view != null) {
             centerContainer.setCenter(view);
@@ -65,15 +68,16 @@ public class MainGameScreenController {
     }
     // END TEMPORARY TEST FEATURE
 
-    public void startStoryBattle(String enemyName) {
+    public void startStoryBattle(List<String> enemyNames) {
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/cs2/javafx/views/Battle.fxml"));
         try {
             javafx.scene.Parent view = loader.load();
             cs2.javafx.controllers.BattleController battleCtrl = loader.getController();
             battleCtrl.setParentController(this);
+            battleCtrl.startStoryBattleWithEnemies(enemyNames);
             centerContainer.setCenter(view);
-            logMessage("=== Story Battle: " + enemyName + " ===");
+            logMessage("=== Story Battle: " + String.join(", ", enemyNames) + " ===");
         } catch (java.io.IOException e) {
             logMessage("ERROR: Could not load Battle.fxml — " + e.getMessage());
             e.printStackTrace();
@@ -82,12 +86,25 @@ public class MainGameScreenController {
 
     @FXML
     private void showInventory(ActionEvent event) {
-        logMessage("Inventory screen not implemented yet.");
+        PlayerState player = GameManager.getInstance().getPlayerState();
+        if (player == null) {
+            logMessage("Start a new game or load a save to access inventory!");
+            return;
+        }
+
+        InventoryController.showInventoryDialog(
+                centerContainer.getScene().getWindow(),
+                player,
+                false // isCombat
+        );
     }
 
     @FXML
     private void showQuest(ActionEvent event) {
-        logMessage("Quest screen not implemented yet.");
+        Parent view = ScreenManager.loadSubPane("/cs2/javafx/views/QuestScreen.fxml");
+        if (view != null) {
+            centerContainer.setCenter(view);
+        }
     }
 
     @FXML
@@ -116,6 +133,22 @@ public class MainGameScreenController {
     private void handleExit(ActionEvent event) {
         // Switch back to start screen
         ScreenManager.setScreen("/cs2/javafx/views/StartScreen.fxml");
+    }
+
+    @FXML
+    private void showProfile(ActionEvent event) {
+        Parent view = ScreenManager.loadSubPane("/cs2/javafx/views/ProfileScreen.fxml");
+        if (view != null) {
+            centerContainer.setCenter(view);
+        }
+    }
+
+    @FXML
+    private void showShop(ActionEvent event) {
+        Parent view = ScreenManager.loadSubPane("/cs2/javafx/views/ShopScreen.fxml");
+        if (view != null) {
+            centerContainer.setCenter(view);
+        }
     }
     
     public void logMessage(String message) {

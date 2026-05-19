@@ -3,6 +3,7 @@ package cs2.javafx.combat;
 import cs2.javafx.model.*;
 import cs2.javafx.model.CombatResult.UIUpdate;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -45,15 +46,31 @@ import java.util.Random;
 public class CombatEngine {
 
     private PlayerState player;
-    private Enemy       enemy;
+    private List<Enemy> enemies;
     private final Random random = new Random();
 
     // ── Setup ─────────────────────────────────────────────────────
 
     /** Call before the first player action of a new encounter. */
-    public void startCombat(PlayerState player, Enemy enemy) {
+    public void startCombat(PlayerState player, List<Enemy> enemies) {
         this.player = player;
-        this.enemy  = enemy;
+        this.enemies = enemies;
+    }
+
+    public Enemy getEnemy() {
+        if (enemies == null) return null;
+        for (Enemy e : enemies) {
+            if (e.isAlive()) return e;
+        }
+        return null;
+    }
+
+    private boolean areAllEnemiesDead() {
+        if (enemies == null) return true;
+        for (Enemy e : enemies) {
+            if (e.isAlive()) return false;
+        }
+        return true;
     }
 
     // ── Public player action methods ─────────────────────────────
@@ -73,17 +90,23 @@ public class CombatEngine {
      */
     public CombatResult playerAttack() {
         CombatResult.Builder result = new CombatResult.Builder();
+        Enemy target = getEnemy();
+        if (target == null) return result.outcome(CombatResult.Outcome.PLAYER_WIN).build();
 
         // First action
-        performOneAttack(result);
+        performOneAttack(result, target);
 
         // Speed double-attack: player speed >= 2× enemy speed gets a full second action
-        if (player.getAttackSpeed() >= 2 * enemy.getAttackSpeed()) {
+        if (player.getAttackSpeed() >= 2 * target.getAttackSpeed()) {
             result.log("⚡ Double speed — " + player.getName() + " acts again!");
-            performOneAttack(result);
+            // Check if first target died and we need a new one
+            target = getEnemy();
+            if (target != null) {
+                performOneAttack(result, target);
+            }
         }
 
-        if (!enemy.isAlive()) return resolveEnemyDeath(result);
+        if (areAllEnemiesDead()) return resolveBattleVictory(result);
         return resolveEnemyTurn(result);
     }
 
@@ -113,38 +136,40 @@ public class CombatEngine {
         result.log("⚔ Enemy Turn", UIUpdate.REFRESH_TURN_LABEL);
 
         // --- Enemy attacks ---
-        tickBossCounter(result); // tick before resolving the attack
+        for (Enemy e : enemies) {
+            if (!e.isAlive()) continue;
+            tickBossCounter(result, e); // tick before resolving the attack
 
-        if (enemy.isStunned()) {
-            result.log("💫 " + enemy.getName() + " is stunned and cannot attack!");
-        } else {
-            int rawDmg    = enemy.getDamage();
-            int actualDmg;
-
-            if (parried) {
-                actualDmg = 0;
-                result.log("⚔ Parry! Knight deflects and counterattacks for "
-                        + player.getFinalDamage() + " damage!");
-                dealDamageToEnemy(player.getFinalDamage(), result);
-            } else if (blocked) {
-                actualDmg = rawDmg / 2;
-                result.log("Block! Damage reduced: " + rawDmg + " → " + actualDmg + ".");
+            if (e.isStunned()) {
+                result.log("💫 " + e.getName() + " is stunned and cannot attack!");
             } else {
-                actualDmg = rawDmg;
-                result.log("Block failed — taking full " + rawDmg + " damage.");
-            }
+                int rawDmg    = e.getDamage();
+                int actualDmg;
 
-            if (actualDmg > 0) {
-                player.takeDamage(actualDmg);
-                result.log(player.getName() + " HP: " + player.getCurrentHP()
-                        + "/" + player.getMaxHP(), UIUpdate.REFRESH_PLAYER_HP);
+                if (parried) {
+                    actualDmg = 0;
+                    result.log("⚔ Parry! Knight deflects and counterattacks " + e.getName() + " for "
+                            + player.getFinalDamage() + " damage!");
+                    dealDamageToEnemy(player.getFinalDamage(), result, e);
+                } else if (blocked) {
+                    actualDmg = rawDmg / 2;
+                    result.log("Block! " + e.getName() + "'s damage reduced: " + rawDmg + " → " + actualDmg + ".");
+                } else {
+                    actualDmg = rawDmg;
+                    result.log("Block failed — taking full " + rawDmg + " damage from " + e.getName() + ".");
+                }
+
+                if (actualDmg > 0) {
+                    player.takeDamage(actualDmg);
+                    result.log(player.getName() + " HP: " + player.getCurrentHP()
+                            + "/" + player.getMaxHP(), UIUpdate.REFRESH_PLAYER_HP);
+                }
             }
+            applyBossRegen(result, e);
         }
 
-        applyBossRegen(result);
-
-        if (parried && !enemy.isAlive()) return resolveEnemyDeath(result);
-        if (!player.isAlive())          return resolvePlayerDeath(result);
+        if (areAllEnemiesDead()) return resolveBattleVictory(result);
+        if (!player.isAlive())   return resolvePlayerDeath(result);
         return result.outcome(CombatResult.Outcome.ONGOING).build();
     }
 
@@ -175,33 +200,44 @@ public class CombatEngine {
         result.log("💨 " + player.getName() + " attempts to dodge...");
 
         if (dodged) {
-            result.log("Dodge successful! Counterattacking for " + player.getFinalDamage() + "!");
-            dealDamageToEnemy(player.getFinalDamage(), result);
-            if (!enemy.isAlive()) return resolveEnemyDeath(result);
+            Enemy target = getEnemy();
+            if (target != null) {
+                result.log("Dodge successful! Counterattacking " + target.getName() + " for " + player.getFinalDamage() + "!");
+                dealDamageToEnemy(player.getFinalDamage(), result, target);
+                if (areAllEnemiesDead()) return resolveBattleVictory(result);
+            }
         }
 
         // Signal the UI that the enemy phase is starting
         result.log("⚔ Enemy Turn", UIUpdate.REFRESH_TURN_LABEL);
 
-        // FIX 4: Tick the boss stun counter BEFORE applying the enemy attack.
-        tickBossCounter(result);
+        for (Enemy e : enemies) {
+            if (!e.isAlive()) continue;
+            // FIX 4: Tick the boss stun counter BEFORE applying the enemy attack.
+            tickBossCounter(result, e);
 
-        if (!dodged) {
-            // Dodge failed — only let the enemy attack if it is NOT stunned
-            if (enemy.isStunned()) {
-                result.log("💫 " + enemy.getName() + " is stunned and cannot attack!");
+            if (!dodged) {
+                // Dodge failed — only let the enemy attack if it is NOT stunned
+                if (e.isStunned()) {
+                    result.log("💫 " + e.getName() + " is stunned and cannot attack!");
+                } else {
+                    int dmg = e.getDamage();
+                    player.takeDamage(dmg);
+                    result.log("Dodge failed! " + e.getName() + " deals " + dmg + " damage to " + player.getName() + ".");
+                    result.log(player.getName() + " HP: " + player.getCurrentHP() + "/" + player.getMaxHP(),
+                            UIUpdate.REFRESH_PLAYER_HP);
+                    if (!player.isAlive()) return resolvePlayerDeath(result);
+                }
             } else {
-                result.log("Dodge failed!");
-                int dmg = enemy.getDamage();
-                player.takeDamage(dmg);
-                result.log(enemy.getName() + " deals " + dmg + " damage to " + player.getName() + ".");
-                result.log(player.getName() + " HP: " + player.getCurrentHP() + "/" + player.getMaxHP(),
-                        UIUpdate.REFRESH_PLAYER_HP);
-                if (!player.isAlive()) return resolvePlayerDeath(result);
+                if (e.isStunned()) {
+                    result.log("💫 " + e.getName() + " is stunned and cannot attack!");
+                } else {
+                    result.log(e.getName() + " attacks, but you dodged it!");
+                }
             }
+            applyBossRegen(result, e);
         }
 
-        applyBossRegen(result);
         return result.outcome(CombatResult.Outcome.ONGOING).build();
     }
 
@@ -261,7 +297,7 @@ public class CombatEngine {
     // ── Accessors for UI binding ──────────────────────────────────
 
     public PlayerState getPlayer() { return player; }
-    public Enemy       getEnemy()  { return enemy; }
+    public List<Enemy> getEnemies()  { return enemies; }
 
     // ── Internal helpers ──────────────────────────────────────────
 
@@ -277,16 +313,16 @@ public class CombatEngine {
      *   This makes the speed bonus a true second action (with its own passive
      *   roll) rather than a bare extra damage call.
      */
-    private void performOneAttack(CombatResult.Builder result) {
+    private void performOneAttack(CombatResult.Builder result, Enemy target) {
         int dmg = player.getFinalDamage();
-        dealDamageToEnemy(dmg, result);
+        dealDamageToEnemy(dmg, result, target);
 
         // Archer passive: 15% chance to strike again — only if the enemy survived
         if (player.getPlayerClass() == PlayerClass.ARCHER
-                && enemy.isAlive()                        // FIX 2: guard against dead enemy
+                && target.isAlive()                        // FIX 2: guard against dead enemy
                 && random.nextDouble() < 0.15) {
             result.log("✦ Archer passive — strikes again!");
-            dealDamageToEnemy(dmg, result);
+            dealDamageToEnemy(dmg, result, target);
         }
     }
 
@@ -294,11 +330,14 @@ public class CombatEngine {
      * Applies the player's finalDamage to the enemy and logs the result.
      * Tags the line with REFRESH_ENEMY_HP so the enemy bar updates immediately.
      */
-    private void dealDamageToEnemy(int dmg, CombatResult.Builder result) {
-        enemy.takeDamage(dmg);
-        result.log(player.getName() + " deals " + dmg + " to " + enemy.getName()
-                + ". [" + enemy.getCurrentHP() + "/" + enemy.getMaxHP() + " HP]",
+    private void dealDamageToEnemy(int dmg, CombatResult.Builder result, Enemy target) {
+        target.takeDamage(dmg);
+        result.log(player.getName() + " deals " + dmg + " to " + target.getName()
+                + ". [" + target.getCurrentHP() + "/" + target.getMaxHP() + " HP]",
                 UIUpdate.REFRESH_ENEMY_HP);
+        if (!target.isAlive()) {
+             result.log("💀 " + target.getName() + " has been defeated!", UIUpdate.REFRESH_ENEMY_HP);
+        }
     }
 
     /**
@@ -311,20 +350,23 @@ public class CombatEngine {
         // Signal the UI: switch turn indicator to "Enemy Turn" before enemy acts
         result.log("⚔ Enemy Turn", UIUpdate.REFRESH_TURN_LABEL);
 
-        tickBossCounter(result);
+        for (Enemy e : enemies) {
+            if (!e.isAlive()) continue;
+            tickBossCounter(result, e);
 
-        if (enemy.isStunned()) {
-            result.log("💫 " + enemy.getName() + " is stunned — cannot act!");
-        } else {
-            int dmg = enemy.getDamage();
-            player.takeDamage(dmg);
-            result.log(enemy.getName() + " attacks " + player.getName()
-                    + " for " + dmg + " damage!");
-            result.log(player.getName() + " HP: " + player.getCurrentHP()
-                    + "/" + player.getMaxHP(), UIUpdate.REFRESH_PLAYER_HP);
+            if (e.isStunned()) {
+                result.log("💫 " + e.getName() + " is stunned — cannot act!");
+            } else {
+                int dmg = e.getDamage();
+                player.takeDamage(dmg);
+                result.log(e.getName() + " attacks " + player.getName()
+                        + " for " + dmg + " damage!");
+                result.log(player.getName() + " HP: " + player.getCurrentHP()
+                        + "/" + player.getMaxHP(), UIUpdate.REFRESH_PLAYER_HP);
+            }
+
+            applyBossRegen(result, e);
         }
-
-        applyBossRegen(result);
 
         if (!player.isAlive()) return resolvePlayerDeath(result);
         return result.outcome(CombatResult.Outcome.ONGOING).build();
@@ -334,31 +376,31 @@ public class CombatEngine {
      * Ticks the boss stun counter once per round.
      * Logs transitions: "stunned!" and "recovers from stun".
      */
-    private void tickBossCounter(CombatResult.Builder result) {
-        if (!enemy.isBoss()) return;
-        boolean wasStunned = enemy.isStunned();
-        enemy.tickTurn();
-        if (!wasStunned && enemy.isStunned()) {
-            result.log("⚡ " + enemy.getName() + " is overwhelmed — stunned for 1 turn!",
+    private void tickBossCounter(CombatResult.Builder result, Enemy e) {
+        if (!e.isBoss()) return;
+        boolean wasStunned = e.isStunned();
+        e.tickTurn();
+        if (!wasStunned && e.isStunned()) {
+            result.log("⚡ " + e.getName() + " is overwhelmed — stunned for 1 turn!",
                     UIUpdate.REFRESH_TURN_LABEL);
-        } else if (wasStunned && !enemy.isStunned()) {
-            result.log(enemy.getName() + " shakes off the stun.", UIUpdate.REFRESH_TURN_LABEL);
+        } else if (wasStunned && !e.isStunned()) {
+            result.log(e.getName() + " shakes off the stun.", UIUpdate.REFRESH_TURN_LABEL);
         }
     }
 
     /** Applies King Slime regen (and any future regen enemies). */
-    private void applyBossRegen(CombatResult.Builder result) {
-        if (enemy.getRegenPerTurn() > 0 && enemy.isAlive()) {
-            enemy.regen();
-            result.log("♻ " + enemy.getName() + " regenerates — HP: "
-                    + enemy.getCurrentHP() + "/" + enemy.getMaxHP(),
+    private void applyBossRegen(CombatResult.Builder result, Enemy e) {
+        if (e.getRegenPerTurn() > 0 && e.isAlive()) {
+            e.regen();
+            result.log("♻ " + e.getName() + " regenerates — HP: "
+                    + e.getCurrentHP() + "/" + e.getMaxHP(),
                     UIUpdate.REFRESH_ENEMY_HP);
         }
     }
 
-    /** Called when enemy HP drops to 0. Applies Mage's post-victory passive. */
-    private CombatResult resolveEnemyDeath(CombatResult.Builder result) {
-        result.log("💀 " + enemy.getName() + " has been defeated!", UIUpdate.REFRESH_ENEMY_HP);
+    /** Called when all enemies are defeated. Applies Mage's post-victory passive. */
+    private CombatResult resolveBattleVictory(CombatResult.Builder result) {
+        result.log("🎉 All enemies have been defeated!", UIUpdate.REFRESH_ENEMY_HP);
 
         // Mage passive: 10% chance to gain +5 damage after a win
         if (player.getPlayerClass() == PlayerClass.MAGE && random.nextDouble() < 0.10) {

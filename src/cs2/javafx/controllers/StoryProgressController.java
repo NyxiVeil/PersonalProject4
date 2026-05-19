@@ -63,9 +63,9 @@ public class StoryProgressController {
     private void handleChoice(String choice, StoryDay dayInfo) {
         if (choice.equals("Fight")) {
             if (MainGameScreenController.getInstance() != null) {
-                MainGameScreenController.getInstance().startStoryBattle(dayInfo.getEnemyName());
+                MainGameScreenController.getInstance().startStoryBattle(dayInfo.getEnemyNames());
             } else {
-                System.out.println("Switching to Battle View for: " + dayInfo.getEnemyName());
+                System.out.println("Switching to Battle View for: " + dayInfo.getEnemyNames());
             }
         } else {
             boolean shouldRefresh = StoryManager.processChoice(gm.getCurrentDay(), choice, gm);

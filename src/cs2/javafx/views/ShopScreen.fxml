@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cs2.javafx.controllers.ShopController"
+      spacing="20"
+      style="-fx-background-color: #E8C97A; -fx-padding: 25; -fx-border-color: #6B4C11; -fx-border-width: 3;"
+      prefWidth="500"
+      prefHeight="400"
+      alignment="TOP_CENTER">
+
+    <!-- Header Block -->
+    <VBox alignment="CENTER" spacing="5">
+        <Label text="🛒 TOWN MERCHANT"
+               style="-fx-text-fill: #3B1F00; -fx-font-size: 24px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+        <Label text="Spend your gold on restorative provisions for upcoming battles."
+               style="-fx-text-fill: #5C3A00; -fx-font-size: 13px; -fx-font-style: italic; -fx-font-family: 'Georgia';" />
+        <Line startX="-150" endX="150" stroke="#6B4C11" strokeWidth="2" />
+    </VBox>
+
+    <!-- Gold Balance Banner -->
+    <HBox alignment="CENTER" spacing="10"
+          style="-fx-background-color: #F4E4C1; -fx-padding: 10 20; -fx-border-color: #8B6010; -fx-border-width: 1.5; -fx-border-radius: 4;">
+        <Label text="Your Gold Balance:"
+               style="-fx-text-fill: #3B1F00; -fx-font-size: 14px; -fx-font-family: 'Georgia'; -fx-font-weight: bold;" />
+        <Label fx:id="goldLabel" text="0 Gold 💰"
+               style="-fx-text-fill: #8B1A1A; -fx-font-size: 16px; -fx-font-family: 'Georgia'; -fx-font-weight: bold;" />
+    </HBox>
+
+    <!-- Provision items cards VBox -->
+    <VBox spacing="15" alignment="CENTER" maxWidth="440">
+        
+        <!-- Apple Card -->
+        <HBox spacing="20" alignment="CENTER_LEFT"
+              style="-fx-background-color: #F4E4C1; -fx-padding: 12; -fx-border-color: #8B6010; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-radius: 4;">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="🍎 Crisp Apple"
+                       style="-fx-text-fill: #3B1F00; -fx-font-size: 15px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+                <Label text="Restores 5 HP in combat. Stack limit: 10."
+                       style="-fx-text-fill: #5C3A00; -fx-font-size: 12px; -fx-font-family: 'Georgia'; -fx-font-style: italic;" />
+                <Label text="Price: 3 Gold"
+                       style="-fx-text-fill: #8B6010; -fx-font-size: 13px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+            </VBox>
+            <Button text="Buy Apple" onAction="#handleBuyApple"
+                    style="-fx-background-color: #8B1A1A; -fx-text-fill: #FFE0A0; -fx-font-size: 13px; -fx-font-weight: bold; -fx-font-family: 'Georgia'; -fx-border-color: #3B0000; -fx-border-width: 1.5; -fx-cursor: hand;" />
+        </HBox>
+
+        <!-- Potion Card -->
+        <HBox spacing="20" alignment="CENTER_LEFT"
+              style="-fx-background-color: #F4E4C1; -fx-padding: 12; -fx-border-color: #8B6010; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-radius: 4;">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="🧪 Health Potion"
+                       style="-fx-text-fill: #3B1F00; -fx-font-size: 15px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+                <Label text="Restores 25 HP in combat. Stack limit: 10."
+                       style="-fx-text-fill: #5C3A00; -fx-font-size: 12px; -fx-font-family: 'Georgia'; -fx-font-style: italic;" />
+                <Label text="Price: 12 Gold"
+                       style="-fx-text-fill: #8B6010; -fx-font-size: 13px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+            </VBox>
+            <Button text="Buy Potion" onAction="#handleBuyPotion"
+                    style="-fx-background-color: #8B1A1A; -fx-text-fill: #FFE0A0; -fx-font-size: 13px; -fx-font-weight: bold; -fx-font-family: 'Georgia'; -fx-border-color: #3B0000; -fx-border-width: 1.5; -fx-cursor: hand;" />
+        </HBox>
+
+    </VBox>
+
+</VBox>

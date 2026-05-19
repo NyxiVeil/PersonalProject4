@@ -1,5 +1,6 @@
 package cs2.javafx.model;
 
+import cs2.javafx.controllers.MainGameScreenController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,31 +21,31 @@ public class StoryManager {
         days.put(1, new StoryDay(1, "Day 1: The Slime Menace",
                 "The village elder asks you to clear out the slimes that have been ruining the crops.\nQuest: Defeat the slimes.",
                 List.of("Fight", "Flee"),
-                true, "Slime Group"));
+                true, List.of("Slime (10 HP)")));
 
         // Day 2
-        days.put(2, new StoryDay(2, "Day 2: The King of Slimes",
-                "The slimes have formed a massive entity! The King Slime blocks the path to the neighboring town.",
+        days.put(2, new StoryDay(2, "Day 2: The Slime Swarm",
+                "The slimes have gathered in a larger group blocking the path.",
                 List.of("Fight", "Flee"),
-                true, "King Slime"));
+                true, List.of("Slime (10 HP)", "Slime (10 HP)")));
 
         // Day 3
-        days.put(3, new StoryDay(3, "Day 3: The Blacksmith's Offer",
+        days.put(3, new StoryDay(3, "Day 3: Goblin Trouble",
+                "A wandering group of goblins and a slime ambush you!",
+                List.of("Fight", "Flee"),
+                true, List.of("Goblin (20 HP)", "Goblin (20 HP)", "Slime (10 HP)")));
+
+        // Day 4
+        days.put(4, new StoryDay(4, "Day 4: The Blacksmith's Offer",
                 "A wandering blacksmith offers to upgrade your gear for free. Do you accept?",
                 List.of("Yes", "No"),
                 false, null));
 
-        // Day 4
-        days.put(4, new StoryDay(4, "Day 4: Goblin Ambush",
-                "A pack of goblins ambushes you on the road!",
-                List.of("Fight", "Flee"),
-                true, "Goblin Pack"));
-
         // Day 5
         days.put(5, new StoryDay(5, "Day 5: The Goblin King",
-                "You've tracked the goblins back to their camp. Their leader, the Goblin King, challenges you.",
+                "You've tracked the goblins back to their camp. Their leader, the Goblin King, challenges you with his guards.",
                 List.of("Fight", "Flee"),
-                true, "Goblin King"));
+                true, List.of("Goblin (20 HP)", "Goblin King — BOSS (100 HP)", "Goblin (20 HP)")));
 
         // Day 6
         days.put(6, new StoryDay(6, "Day 6: A Villager's Plea",
@@ -56,13 +57,13 @@ public class StoryManager {
         days.put(7, new StoryDay(7, "Day 7: The Graveyard",
                 "You enter the graveyard and are immediately attacked by the undead.",
                 List.of("Fight", "Flee"),
-                true, "Skeleton Horde"));
+                true, List.of("Skeleton (30 HP)", "Skeleton (30 HP)")));
 
         // Day 8
         days.put(8, new StoryDay(8, "Day 8: Colossal Bones",
-                "The bones in the graveyard assemble into a Colossal Skeleton!",
+                "The bones in the graveyard assemble into a Colossal Skeleton, accompanied by more skeletons!",
                 List.of("Fight", "Flee"),
-                true, "Colossal Skeleton"));
+                true, List.of("Skeleton (30 HP)", "Colossal Skeleton — BOSS (200 HP)", "Skeleton (30 HP)")));
 
         // Day 9
         days.put(9, new StoryDay(9, "Day 9: Guild Support",
@@ -74,7 +75,7 @@ public class StoryManager {
         days.put(10, new StoryDay(10, "Day 10: The Dragon",
                 "The sky turns dark as a massive Dragon descends upon the realm. This is your final challenge.",
                 List.of("Fight", "Flee"),
-                true, "Dragon"));
+                true, List.of("Dragon — FINAL BOSS (500 HP)")));
         
         // Post-game
         days.put(11, new StoryDay(11, "Epilogue",
@@ -181,6 +182,11 @@ public class StoryManager {
                 case 10:
                     // Final boss beaten
                     break;
+            }
+            int goldReward = 10 + (day * 2);
+            player.addGold(goldReward);
+            if (MainGameScreenController.getInstance() != null) {
+                MainGameScreenController.getInstance().logMessage("💰 Gained " + goldReward + " gold from narrative victory!");
             }
             gm.advanceDay();
         } else if (isFlee) {

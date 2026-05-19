@@ -102,6 +102,32 @@
                                -fx-background-radius: 2;
                                -fx-padding: 8 4;
                                -fx-cursor: hand;" />
+
+                <Button text="Profile" maxWidth="Infinity"
+                        onAction="#showProfile"
+                        style="-fx-background-color: #D4A843;
+                               -fx-text-fill: #2B1200;
+                               -fx-font-size: 13px;
+                               -fx-font-family: 'Georgia';
+                               -fx-border-color: #6B4C11;
+                               -fx-border-width: 1.5;
+                               -fx-border-radius: 2;
+                               -fx-background-radius: 2;
+                               -fx-padding: 8 4;
+                               -fx-cursor: hand;" />
+
+                <Button text="Shop" maxWidth="Infinity"
+                        onAction="#showShop"
+                        style="-fx-background-color: #D4A843;
+                               -fx-text-fill: #2B1200;
+                               -fx-font-size: 13px;
+                               -fx-font-family: 'Georgia';
+                               -fx-border-color: #6B4C11;
+                               -fx-border-width: 1.5;
+                               -fx-border-radius: 2;
+                               -fx-background-radius: 2;
+                               -fx-padding: 8 4;
+                               -fx-cursor: hand;" />
             </VBox>
 
             <!-- Spacer pushes Save/Load/Exit to the bottom -->

@@ -89,8 +89,17 @@ public class PlayerState implements Serializable {
     // ── Inventory ────────────────────────────────────────────────
     public Map<String, Integer> getInventory() { return inventory; }
 
-    public void addItem(String itemName, int qty) {
-        inventory.merge(itemName, qty, Integer::sum);
+    public boolean addItem(String itemName, int qty) {
+        if (!inventory.containsKey(itemName) && inventory.size() >= 10) {
+            return false; // Enforce max 10 separate types
+        }
+        int currentQty = inventory.getOrDefault(itemName, 0);
+        if (currentQty >= 10) {
+            return false; // Already at max stack size of 10
+        }
+        int newQty = Math.min(10, currentQty + qty);
+        inventory.put(itemName, newQty);
+        return true;
     }
 
     public boolean hasItem(String itemName) {

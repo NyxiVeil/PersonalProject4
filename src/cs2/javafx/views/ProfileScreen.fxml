@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cs2.javafx.controllers.ProfileController"
+      spacing="15"
+      style="-fx-background-color: #E8C97A; -fx-padding: 25; -fx-border-color: #6B4C11; -fx-border-width: 3;"
+      prefWidth="500"
+      prefHeight="400"
+      alignment="TOP_CENTER">
+
+    <!-- Title -->
+    <VBox alignment="CENTER" spacing="5">
+        <Label text="📜 HERO PROFILE"
+               style="-fx-text-fill: #3B1F00; -fx-font-size: 24px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+        <Line startX="-120" endX="120" stroke="#6B4C11" strokeWidth="2" />
+    </VBox>
+
+    <!-- Character Info Block -->
+    <HBox spacing="30" alignment="CENTER"
+          style="-fx-background-color: #F4E4C1; -fx-padding: 15; -fx-border-color: #8B6010; -fx-border-width: 1.5; -fx-border-radius: 4;">
+        
+        <VBox spacing="5" alignment="CENTER_LEFT">
+            <Label fx:id="nameLabel" text="Hero Name: Hero"
+                   style="-fx-text-fill: #3B1F00; -fx-font-size: 16px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+            <Label fx:id="classLabel" text="Class: Knight"
+                   style="-fx-text-fill: #5C3A00; -fx-font-size: 14px; -fx-font-family: 'Georgia'; -fx-font-style: italic;" />
+        </VBox>
+        
+        <VBox spacing="5" alignment="CENTER_LEFT">
+            <Label fx:id="dayLabel" text="Current Progress: Day 1"
+                   style="-fx-text-fill: #3B1F00; -fx-font-size: 14px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+            <Label fx:id="goldLabel" text="Gold: 0 💰"
+                   style="-fx-text-fill: #5C3A00; -fx-font-size: 14px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+        </VBox>
+    </HBox>
+
+    <!-- Stats Block -->
+    <VBox spacing="10" maxWidth="420"
+          style="-fx-background-color: #F4E4C1; -fx-padding: 20; -fx-border-color: #8B6010; -fx-border-width: 1.5; -fx-border-radius: 4;">
+        
+        <Label text="⚔ CORE ATTRIBUTES"
+               style="-fx-text-fill: #8B1A1A; -fx-font-size: 14px; -fx-font-weight: bold; -fx-font-family: 'Georgia';" />
+        <Line startX="0" endX="380" stroke="#8B6010" strokeWidth="1" />
+
+        <GridPane hgap="20" vgap="12">
+            <padding>
+                <Insets top="8" bottom="8" left="10" right="10" />
+            </padding>
+
+            <!-- Attack Stat -->
+            <Label text="Attack Damage:" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                   style="-fx-text-fill: #3B1F00; -fx-font-size: 14px; -fx-font-family: 'Georgia'; -fx-font-weight: bold;" />
+            <Label fx:id="attackLabel" text="10 (Base) [Final: 10]" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                   style="-fx-text-fill: #5C3A00; -fx-font-size: 14px; -fx-font-family: 'Georgia';" />
+
+            <!-- Health Stat -->
+            <Label text="Health (HP):" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                   style="-fx-text-fill: #3B1F00; -fx-font-size: 14px; -fx-font-family: 'Georgia'; -fx-font-weight: bold;" />
+            <Label fx:id="healthLabel" text="100 / 100 HP" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                   style="-fx-text-fill: #5C3A00; -fx-font-size: 14px; -fx-font-family: 'Georgia';" />
+
+            <!-- Attack Speed Stat -->
+            <Label text="Attack Speed:" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                   style="-fx-text-fill: #3B1F00; -fx-font-size: 14px; -fx-font-family: 'Georgia'; -fx-font-weight: bold;" />
+            <Label fx:id="speedLabel" text="1" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                   style="-fx-text-fill: #5C3A00; -fx-font-size: 14px; -fx-font-family: 'Georgia';" />
+
+            <!-- Extra Lives -->
+            <Label text="Extra Lives:" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                   style="-fx-text-fill: #3B1F00; -fx-font-size: 14px; -fx-font-family: 'Georgia'; -fx-font-weight: bold;" />
+            <Label fx:id="livesLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                   style="-fx-text-fill: #5C3A00; -fx-font-size: 14px; -fx-font-family: 'Georgia';" />
+        </GridPane>
+    </VBox>
+
+</VBox>
